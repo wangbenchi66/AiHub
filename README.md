@@ -16,7 +16,7 @@ AI 聚合桌面工具：把常用的 AI 站点收进一个软件里直接使用�
 - **完整 Web 登录凭证**：同步 Cookie + localStorage + sessionStorage（所有站点）；DeepSeek 的 `userToken` 也在内
 - 可打包为 Windows 安装包（NSIS）与 macOS DMG
 
-## 当前进度（v0.1.0 / M2）
+## 当前进度（v0.1.1 / M2）
 
 已可运行：
 
@@ -41,6 +41,8 @@ npm run build:win    # Windows NSIS + portable（未签名）
 npm run build:mac    # 需要 macOS 环境
 ```
 
+也可以双击根目录的 **`打包AiHub.bat`** 进行本地 Windows 打包；它会在结束时列出安装包。终端调用可加 `--no-pause`。
+
 也可以直接双击根目录的 **`启动AiHub.bat`**：它会检查 npm / Electron 是否就绪，然后执行 `npm run dev`，并使用项目内的 `.electron-data` 作为开发数据目录。首次使用前仍需先执行一次 `npm install`。
 
 ## 发布
@@ -48,11 +50,11 @@ npm run build:mac    # 需要 macOS 环境
 推送 `v*` tag 会自动触发 GitHub Actions，构建 Windows / macOS 并创建 GitHub Release：
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.1
+git push origin v0.1.1
 ```
 
-tag 必须与 `package.json` 的 `version` 一致。工作流见 `.github/workflows/release.yml`，Release 会附带安装包、便携版、DMG/ZIP 和 `SHA256SUMS.txt`。
+tag 必须与 `package.json` 的 `version` 一致。工作流见 `.github/workflows/release.yml`，Release 会附带安装包、便携版、DMG/ZIP。
 
 如果 `npm install` 后 Electron 没下载完整（国内网络）：
 
@@ -63,7 +65,7 @@ node node_modules/electron/install.js
 
 Windows 安装包输出在 `release/`。项目路径含中文时，`npm run build:win` 会自动把构建输出切到 ASCII 临时目录，避免 NSIS 两段式构建失败。
 
-> 注意：NSIS 安装器**从含中文的路径直接启动**时会报 “Error writing temporary file”。`npm run build:win` 会额外把安装包和校验文件发布到 `C:\aihub-release`，请从该目录运行/分发，或先把安装包复制到纯英文路径。
+> 注意：NSIS 安装器**从含中文的路径直接启动**时会报 “Error writing temporary file”。默认产物只写入项目 `release/`；如确实需要额外的纯英文发布目录，请显式设置 `AIHUB_PUBLISH_DIR`，或手动把安装包复制到纯英文路径。
 
 ## 免费签名 / 首次运行提示
 

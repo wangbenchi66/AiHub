@@ -151,7 +151,7 @@ export interface AiHubApi {
   syncNow: () => Promise<SyncStatus>
   bridgeInfo: () => Promise<BridgeInfo>
   openExtensionFolder: () => Promise<void>
-  openExtensionsPage: (target?: { id: string; exe: string; profileDir?: string }) => Promise<void>
+  openExtensionsPage: (target?: { id: string; exe: string; profileDir?: string }) => Promise<'extension' | 'browser'>
   onSyncChanged: (callback: (status: SyncStatus) => void) => () => void
   openNative: (providerId: string) => Promise<void>
   openExternal: (url: string) => Promise<void>

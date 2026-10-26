@@ -444,7 +444,10 @@ export default function App(): ReactElement {
 
   const openExtensionsPage = useCallback(async (): Promise<void> => {
     try {
-      await window.aihub.openExtensionsPage()
+      const result = await window.aihub.openExtensionsPage()
+      if (result === 'browser') {
+        showToast('浏览器已启动；如未自动跳转，扩展页地址已复制，先按 Ctrl/Cmd+L 聚焦地址栏，再按 Ctrl/Cmd+V 粘贴并回车')
+      }
     } catch (error) {
       showToast(error instanceof Error ? error.message : '打开扩展管理页失败')
     }

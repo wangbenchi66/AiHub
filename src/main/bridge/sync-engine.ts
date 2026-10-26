@@ -32,6 +32,7 @@ interface PollResult {
   reset: boolean
   fullSync: boolean
   events: QueuedEvent[]
+  commands?: string[]
 }
 
 interface PendingSync {
@@ -62,6 +63,7 @@ export class SyncEngine {
   private pendingSyncs = new Map<string, PendingSync>()
   private pendingEvents = new Map<number, PendingEvent>()
   private queue: QueuedEvent[] = []
+  private commands: string[] = []
   private waiters: Array<() => void> = []
   private seq = 0
   private port = 0
@@ -144,6 +146,13 @@ export class SyncEngine {
     this.wake()
     this.emitStatus()
     return this.status()
+  }
+
+  requestOpenExtensions(): boolean {
+    if (!this.status().connected) return false
+    this.commands.push('open-extensions')
+    this.wake()
+    return true
   }
 
   isLinked(): boolean {
@@ -515,6 +524,7 @@ export class SyncEngine {
 
   waitForEvents(since: number, timeoutMs: number): Promise<PollResult> {
     const ready = (): PollResult | null => {
+      const commands = this.commands.length ? this.commands.splice(0) : undefined
       if (this.fullSyncRequested) {
         this.fullSyncRequested = false
         return {
@@ -522,12 +532,13 @@ export class SyncEngine {
           cursor: this.seq,
           reset: true,
           fullSync: true,
-          events: []
+          events: [],
+          commands
         }
       }
       if (this.resetRequested) {
         this.resetRequested = false
-        return { session: SESSION_ID, cursor: this.seq, reset: true, fullSync: false, events: [] }
+        return { session: SESSION_ID, cursor: this.seq, reset: true, fullSync: false, events: [], commands }
       }
       const events = this.queue.filter((event) => event.seq > since)
       if (events.length > 0) {
@@ -536,7 +547,18 @@ export class SyncEngine {
           cursor: events[events.length - 1].seq,
           reset: false,
           fullSync: false,
-          events
+          events,
+          commands
+        }
+      }
+      if (commands) {
+        return {
+          session: SESSION_ID,
+          cursor: since,
+          reset: false,
+          fullSync: false,
+          events: [],
+          commands
         }
       }
       return null

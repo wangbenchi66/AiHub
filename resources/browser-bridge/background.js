@@ -307,6 +307,26 @@ function startPolling() {
   void pollLoop(token)
 }
 
+async function openExtensionsPage() {
+  const ua = navigator.userAgent
+  const url = ua.includes('Edg/')
+    ? 'edge://extensions'
+    : ua.includes('OPR/')
+      ? 'opera://extensions'
+      : 'chrome://extensions'
+  try {
+    await chrome.tabs.create({ url })
+  } catch {
+    // Some Chromium builds reject internal pages from an extension tab.
+  }
+}
+
+async function applyCommands(commands) {
+  for (const command of commands) {
+    if (command === 'open-extensions') await openExtensionsPage()
+  }
+}
+
 async function pollLoop(token) {
   while (syncEnabled && token === pollToken) {
     try {
@@ -331,6 +351,9 @@ async function pollLoop(token) {
         clearTimeout(timer)
       }
 
+      if (Array.isArray(data.commands) && data.commands.length) {
+        await applyCommands(data.commands)
+      }
       if (data.reset || data.fullSync) {
         await fullSync()
         continue

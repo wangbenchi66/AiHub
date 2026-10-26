@@ -1,12 +1,9 @@
 import { execFileSync } from 'node:child_process'
-import { createHash } from 'node:crypto'
 import {
   copyFileSync,
   mkdirSync,
-  readFileSync,
   readdirSync,
-  rmSync,
-  writeFileSync
+  rmSync
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -77,25 +74,19 @@ if (needsCopy) {
 }
 
 // NSIS 安装器从含中文的路径启动时会报 "Error writing temporary file"。
-// 额外发布一份到纯 ASCII 目录，用户直接从那里运行/分发即可。
-const publishDir = process.env.AIHUB_PUBLISH_DIR ?? 'C:\\aihub-release'
-try {
-  mkdirSync(publishDir, { recursive: true })
-  const names = readdirSync(release).filter(
-    (name) => name.endsWith('.exe') || name.endsWith('.blockmap') || name === 'latest.yml'
-  )
-  for (const name of names) copyFileSync(join(release, name), join(publishDir, name))
-
-  const exes = readdirSync(release).filter((name) => name.endsWith('.exe')).sort()
-  const sums = exes
-    .map((name) => {
-      const hash = createHash('sha256').update(readFileSync(join(release, name))).digest('hex')
-      return `${hash}  ${name}`
-    })
-    .join('\n')
-  writeFileSync(join(release, 'SHA256SUMS.txt'), `${sums}\n`, 'utf8')
-  copyFileSync(join(release, 'SHA256SUMS.txt'), join(publishDir, 'SHA256SUMS.txt'))
-  console.log(`ASCII 发布目录（可直接运行/分发）：${publishDir}`)
-} catch (error) {
-  console.warn(`无法复制到 ASCII 发布目录 ${publishDir}: ${error.message}`)
+// 默认只写入项目 release/；如需额外的 ASCII 发布目录，必须显式设置
+// AIHUB_PUBLISH_DIR，绝不在 C 盘自动创建测试/发布目录。
+const publishDir = process.env.AIHUB_PUBLISH_DIR
+if (publishDir) {
+  try {
+    mkdirSync(publishDir, { recursive: true })
+    const names = readdirSync(release).filter(
+      (name) => name.endsWith('.exe') || name.endsWith('.blockmap') || name === 'latest.yml'
+    )
+    for (const name of names) copyFileSync(join(release, name), join(publishDir, name))
+    console.log(`额外发布目录：${publishDir}`)
+  } catch (error) {
+    console.warn(`无法复制到发布目录 ${publishDir}: ${error.message}`)
+  }
 }
+

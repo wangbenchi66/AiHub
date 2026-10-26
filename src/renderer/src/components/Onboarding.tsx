@@ -31,6 +31,7 @@ export function Onboarding({
   const [policy, setPolicy] = useState<SyncPolicy>({
     conflict: 'browser'
   })
+  const [pageHint, setPageHint] = useState('')
 
   const all = useMemo(() => {
     const byId = new Map<string, BrowserInfo>()
@@ -94,11 +95,16 @@ export function Onboarding({
   const openExtensionsPage = async (): Promise<void> => {
     if (!selected) return
     try {
-      await window.aihub.openExtensionsPage({
+      const result = await window.aihub.openExtensionsPage({
         id: selected.id,
         exe: selected.exe,
         profileDir: binding?.profileDir
       })
+      setPageHint(
+        result === 'browser'
+          ? '浏览器已启动；如果没自动打开扩展页，地址已复制，先按 Ctrl/Cmd+L 聚焦地址栏，再按 Ctrl/Cmd+V 粘贴并回车。'
+          : ''
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : '打开扩展管理页失败')
     }
@@ -262,6 +268,7 @@ export function Onboarding({
             <p className="hint">
               没有看到扩展？确认它加载在上面的 Profile 中；浏览器没启动时先启动一次。
             </p>
+            {pageHint ? <p className="hint">{pageHint}</p> : null}
             <p className="hint">
               Chrome 会提示“读取所有网站数据”，这是为了同步所有站点的 Cookie、localStorage 和 sessionStorage；Bridge 不读取页面内容。
             </p>

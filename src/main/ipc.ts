@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, clipboard, dialog, ipcMain, shell } from 'electron'
 import { spawn } from 'node:child_process'
 import { cpSync, existsSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -203,21 +203,32 @@ export function registerIpc(engine: SyncEngine, bridge: BridgeServer): void {
   ipcMain.handle(IPC.openExtensionsPage, async (
     _event,
     target?: { id: string; exe: string; profileDir?: string }
-  ): Promise<void> => {
-    let browser = target ?? null
-    if (!browser) {
-      const settings = loadSettings()
-      browser = settings.sync.browser
-    }
+  ): Promise<'extension' | 'browser'> => {
+    const settings = loadSettings()
+    const browser = target ?? settings.sync.browser
     if (!browser) throw new Error('还没有链接浏览器')
+
+    // Chromium blocks chrome:// URLs passed on the command line, so ask the
+    // connected Bridge extension to open its own management page when possible.
+    const linked = settings.sync.browser
+    const sameBrowser = !linked || (
+      linked.exe === browser.exe &&
+      (!browser.profileDir || linked.profileDir === browser.profileDir)
+    )
+    if (sameBrowser && engine.requestOpenExtensions()) return 'extension'
+
+    const url = extensionsUrl(browser.id)
     const args: string[] = []
     if (browser.profileDir) args.push(`--profile-directory=${browser.profileDir}`)
-    args.push(extensionsUrl(browser.id))
+    args.push(url)
+    clipboard.writeText(url)
     const child = spawn(browser.exe, args, {
       detached: true,
       stdio: 'ignore'
     })
+    child.on('error', () => {})
     child.unref()
+    return 'browser'
   })
 
   ipcMain.handle(IPC.openNative, async (_event, providerId: string): Promise<void> => {

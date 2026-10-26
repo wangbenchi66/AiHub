@@ -1,6 +1,6 @@
 {
   "name": "aihub",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "AI 聚合桌面工具",
   "main": "./out/main/index.js",

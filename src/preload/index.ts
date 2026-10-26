@@ -29,7 +29,7 @@ const api: AiHubApi = {
   syncNow: (): Promise<SyncStatus> => ipcRenderer.invoke(IPC.syncNow),
   bridgeInfo: (): Promise<BridgeInfo> => ipcRenderer.invoke(IPC.bridgeInfo),
   openExtensionFolder: (): Promise<void> => ipcRenderer.invoke(IPC.openExtensionFolder),
-  openExtensionsPage: (target?: { id: string; exe: string; profileDir?: string }): Promise<void> =>
+  openExtensionsPage: (target?: { id: string; exe: string; profileDir?: string }): Promise<'extension' | 'browser'> =>
     ipcRenderer.invoke(IPC.openExtensionsPage, target),
   onSyncChanged: (callback: (status: SyncStatus) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, status: SyncStatus): void => callback(status)
