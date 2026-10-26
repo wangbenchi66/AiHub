@@ -38,6 +38,13 @@ export default function App(): ReactElement {
   const [tabs, setTabs] = useState<TabState[]>([])
   const [titles, setTitles] = useState<Record<string, string>>({})
   const [activeTabId, setActiveTabId] = useState('home')
+  const [homeOpen, setHomeOpen] = useState<boolean>(() => {
+    try {
+      return window.localStorage.getItem('aihub.homeOpen') !== '0'
+    } catch {
+      return true
+    }
+  })
   const [loaded, setLoaded] = useState<Set<string>>(new Set(['home']))
   const [view, setView] = useState<RailView>('home')
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
@@ -83,6 +90,7 @@ export default function App(): ReactElement {
             : restored[0]?.tabId ?? 'home'
         setTabs(restored)
         setActiveTabId(nextActive)
+        if (nextActive === 'home') setHomeOpen(true)
         setLoaded(new Set(['home', nextActive]))
         if (!data.settings.onboardingCompleted) setOnboardingOpen(true)
         setReady(true)
@@ -109,6 +117,14 @@ export default function App(): ReactElement {
       // ignore private mode / storage errors
     }
   }, [sidebarCollapsed])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('aihub.homeOpen', homeOpen ? '1' : '0')
+    } catch {
+      // ignore private mode / storage errors
+    }
+  }, [homeOpen])
 
   useEffect(() => {
     if (!settings) return
@@ -179,25 +195,52 @@ export default function App(): ReactElement {
   }, [settings, updateSettings])
 
   const closeTab = useCallback((tabId: string): void => {
-    setTabs((prev) => {
-      const index = prev.findIndex((tab) => tab.tabId === tabId)
-      if (index < 0) return prev
-      const next = prev.filter((tab) => tab.tabId !== tabId)
-      if (activeTabId === tabId) {
-        const fallback = next[index - 1] ?? next[index] ?? null
-        setActiveTabId(fallback?.tabId ?? 'home')
-        if (!fallback) setView('home')
-      }
-      return next
-    })
+    const index = tabs.findIndex((tab) => tab.tabId === tabId)
+    if (index < 0) return
+    const next = tabs.filter((tab) => tab.tabId !== tabId)
+    setTabs(next)
     setTitles((prev) => {
-      const next = { ...prev }
-      delete next[tabId]
-      return next
+      const copy = { ...prev }
+      delete copy[tabId]
+      return copy
     })
-  }, [activeTabId])
+    if (activeTabId === tabId) {
+      const fallback = next[index - 1] ?? next[index] ?? null
+      setActiveTabId(fallback?.tabId ?? 'home')
+      if (!fallback) setView('home')
+    }
+    // 所有标签都关闭后，自动打开默认的 AI 广场。
+    if (next.length === 0) {
+      setHomeOpen(true)
+      setActiveTabId('home')
+      setView('home')
+    }
+  }, [tabs, activeTabId])
+
+  const openHome = useCallback((): void => {
+    setHomeOpen(true)
+    setView('home')
+    setActiveTabId('home')
+  }, [])
+
+  const closeHome = useCallback((): void => {
+    if (!homeOpen) return
+    if (tabs.length === 0) {
+      // 关闭 AI 广场后没有任何标签：按默认行为重新打开它。
+      setHomeOpen(true)
+      setActiveTabId('home')
+      setView('home')
+      return
+    }
+    setHomeOpen(false)
+    if (activeTabId === 'home') {
+      const fallback = tabs[tabs.length - 1]
+      setActiveTabId(fallback.tabId)
+    }
+  }, [homeOpen, tabs, activeTabId])
 
   const focusSearch = useCallback((): void => {
+    setHomeOpen(true)
     setView('home')
     setActiveTabId('home')
     window.setTimeout(() => document.getElementById('global-search')?.focus(), 30)
@@ -368,11 +411,11 @@ export default function App(): ReactElement {
         focusSearch()
       } else if (key === 't') {
         event.preventDefault()
-        setActiveTabId('home')
-        setView('home')
+        openHome()
       } else if (key === 'w') {
         event.preventDefault()
-        if (activeTabId !== 'home') closeTab(activeTabId)
+        if (activeTabId === 'home') closeHome()
+        else closeTab(activeTabId)
       } else if (key === ',') {
         event.preventDefault()
         setSettingsOpen(true)
@@ -388,17 +431,17 @@ export default function App(): ReactElement {
       } else if (/^[1-9]$/.test(key)) {
         const index = Number(key) - 1
         event.preventDefault()
-        const all = [{ tabId: 'home' }, ...tabs]
-        const target = all[index]
-        if (target) {
-          setActiveTabId(target.tabId)
-          if (target.tabId === 'home') setView('home')
+        if (index === 0) {
+          openHome()
+          return
         }
+        const target = tabs[index - 1]
+        if (target) setActiveTabId(target.tabId)
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [boot, tabs, activeTabId, closeTab, focusSearch, showToast])
+  }, [boot, tabs, activeTabId, closeTab, closeHome, openHome, focusSearch, showToast])
 
   const visibleProviders = useMemo(() => {
     if (!settings) return []
@@ -447,11 +490,14 @@ export default function App(): ReactElement {
         sync={sync}
         view={view}
         collapsed={sidebarCollapsed}
+        homeOpen={homeOpen}
         onSelectTab={(tabId) => setActiveTabId(tabId)}
         onCloseTab={closeTab}
-        onHome={() => { setActiveTabId('home'); setView('home') }}
+        onCloseHome={closeHome}
+        onHome={openHome}
         onNew={focusSearch}
         onView={(next) => {
+          setHomeOpen(true)
           setView(next)
           setActiveTabId('home')
           setQuery('')
@@ -468,9 +514,11 @@ export default function App(): ReactElement {
           titles={titles}
           activeTabId={activeTabId}
           providers={settings.providers}
+          homeOpen={homeOpen}
           onSelect={(tabId) => setActiveTabId(tabId)}
           onClose={closeTab}
-          onHome={() => { setActiveTabId('home'); setView('home') }}
+          onCloseHome={closeHome}
+          onHome={openHome}
           onNew={focusSearch}
         />
 
