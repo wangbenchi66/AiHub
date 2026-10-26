@@ -45,7 +45,13 @@ function extensionSource(): string {
 
 function extensionPath(): string {
   const source = extensionSource()
-  const target = join(app.getPath('userData'), 'bridge-extension')
+
+  // Portable builds run from a temporary directory. Keep the extension next to
+  // the portable exe (still the "install" directory), not in userData.
+  const portableDir = process.env.PORTABLE_EXECUTABLE_DIR
+  if (!portableDir) return source
+
+  const target = join(portableDir, 'bridge-extension')
   const marker = join(target, '.aihub-version')
   try {
     const sourceStamp = [
@@ -73,6 +79,9 @@ function extensionsUrl(browserId: string): string {
 
 export function registerIpc(engine: SyncEngine, bridge: BridgeServer): void {
   ipcMain.handle(IPC.bootstrap, async (): Promise<Bootstrap> => {
+    // Create the unpacked extension directory at startup, not only after the
+    // user reaches the install step, so the path shown by the wizard is real.
+    extensionPath()
     const settings = loadSettings()
     const browsers = await detectBrowsers()
     return {
