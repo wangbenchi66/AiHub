@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        width: 300px;
+        margin: 0;
+        padding: 14px;
+        font-family: "Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif;
+        background: #f7f7f8;
+        color: #1d2129;
+      }
+      h1 { font-size: 14px; margin: 0 0 4px; }
+      .sub { font-size: 11px; color: #8a9099; margin-bottom: 12px; }
+      .status { display: flex; align-items: center; gap: 7px; font-size: 12px; margin-bottom: 10px; }
+      .dot { width: 7px; height: 7px; border-radius: 50%; background: #c4c8ce; }
+      .dot.on { background: #22c55e; }
+      .dot.paused { background: #f5a524; }
+      .meta { font-size: 11px; color: #8a9099; line-height: 1.7; margin-bottom: 12px; }
+      .switch-row {
+        display: flex; align-items: center; justify-content: space-between;
+        margin: 0 0 12px; padding: 9px 10px; border: 1px solid #e5e7eb;
+        border-radius: 8px; background: #fff; font-size: 12px; cursor: pointer;
+      }
+      .switch { position: relative; width: 34px; height: 20px; flex: none; }
+      .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+      .slider {
+        position: absolute; inset: 0; border-radius: 999px; background: #d1d5db;
+        transition: background .15s ease;
+      }
+      .slider::before {
+        content: ""; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px;
+        border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+        transition: transform .15s ease;
+      }
+      .switch input:checked + .slider { background: #5b5bd6; }
+      .switch input:checked + .slider::before { transform: translateX(14px); }
+      .switch input:focus-visible + .slider { outline: 2px solid #5b5bd6; outline-offset: 2px; }
+      button {
+        width: 100%; height: 32px; border: 1px solid #5b5bd6; border-radius: 7px;
+        background: #5b5bd6; color: #fff; font-size: 12px; cursor: pointer;
+      }
+      button:hover { filter: brightness(.95); }
+      button:disabled { opacity: .45; cursor: default; filter: none; }
+      .note { font-size: 10.5px; color: #8a9099; line-height: 1.6; margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <h1>AiHub Bridge</h1>
+    <div class="sub">同步 Cookie / localStorage</div>
+    <label class="switch-row">
+      <span>启用同步</span>
+      <span class="switch">
+        <input id="enabled" type="checkbox" />
+        <span class="slider"></span>
+      </span>
+    </label>
+    <div class="status"><span id="dot" class="dot"></span><span id="state">正在检测 AiHub…</span></div>
+    <div class="meta" id="meta"></div>
+    <button id="sync">立即同步</button>
+    <div class="note">不会读取密码、书签或页面内容；同步浏览器中所有站点的 Cookie、localStorage 和 sessionStorage。</div>
+    <script src="popup.js"></script>
+  </body>
+</html>

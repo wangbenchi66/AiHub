@@ -1,0 +1,20 @@
+export const IPC = {
+  bootstrap: 'app:bootstrap',
+  updateSettings: 'settings:update',
+  saveProviders: 'providers:save',
+  detectBrowsers: 'browsers:detect',
+  pickBrowser: 'browsers:pick',
+  linkBrowser: 'sync:link',
+  unlinkBrowser: 'sync:unlink',
+  syncStatus: 'sync:status',
+  syncNow: 'sync:now',
+  syncChanged: 'sync:changed',
+  bridgeInfo: 'sync:bridge-info',
+  openExtensionFolder: 'sync:open-extension-folder',
+  openExtensionsPage: 'sync:open-extensions-page',
+  openNative: 'browser:open-native',
+  openExternal: 'nav:open-external',
+  openPath: 'app:open-path',
+  storageGet: 'storage:get',
+  saveTabs: 'tabs:save'
+} as const

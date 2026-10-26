@@ -1,0 +1,54 @@
+appId: com.aihub.desktop
+productName: AiHub
+copyright: Copyright (c) 2026 AiHub
+
+directories:
+  buildResources: build
+  output: release
+
+files:
+  - out/**/*
+  - package.json
+
+extraResources:
+  - from: resources/browser-bridge
+    to: browser-bridge
+
+asar: true
+npmRebuild: false
+afterPack: scripts/after-pack-mac.cjs
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  icon: build/icon.ico
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: AiHub
+  artifactName: ${productName}-Setup-${version}.${ext}
+
+mac:
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+    - target: zip
+      arch: [x64, arm64]
+  category: public.app-category.productivity
+  icon: build/icon.png
+  identity: null
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+dmg:
+  artifactName: ${productName}-${version}-${arch}.${ext}
+

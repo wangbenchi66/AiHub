@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "AiHub Bridge",
+  "description": "同步浏览器所有站点的 Cookie 到本机 AiHub，不读取页面内容。",
+  "version": "0.1.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0kPeStyWgRJBIO+o/XB7McgYe+0zuiu81zOtW3HIZi/hCgqPhs0HwGYK5Edo4zjGQgHMSVbyCaG/MaSRHguaeOdbsHhWwrOvTtGXBigng5ckyBH3o5g4L120Ig0HXxcD3727tox9WtvpkbVCV/QXWRjchr5yKEZ46iPXBTR3WJlqig4JTUrCBqgyoDGLjO+q2eWXYo7RAfOkrNR1Qzvsg9246mpEpXm25w5ZaIhyFYtx30gyHnk/HXaNkZUjYreif1IW3WOfCAX4j02ZaxAXgjizb9yDW0eUN4q+nHftBqwc/lr94CcmI+x4hP83H7vkau+EXqhqCoTP67J1RCRzGwIDAQAB",
+  "minimum_chrome_version": "110",
+  "permissions": [
+    "cookies",
+    "alarms",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "site-storage.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "AiHub Bridge",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

@@ -1,0 +1,51 @@
+import type { Provider } from './types'
+
+export const PRESET_PROVIDERS: Provider[] = [
+  { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/', icon: 'chatgpt.svg', color: '#10A37F', group: '对话', enabled: true },
+  { id: 'claude', name: 'Claude', url: 'https://claude.ai/new', icon: 'claude.svg', color: '#D97757', group: '对话', enabled: true },
+  { id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com/app', icon: 'gemini.svg', color: '#4285F4', group: '对话', enabled: true },
+  { id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/', icon: 'deepseek.svg', color: '#4D6BFE', group: '对话', enabled: true },
+  { id: 'kimi', name: 'Kimi', url: 'https://www.kimi.com/', icon: 'kimi.svg', color: '#111827', group: '对话', enabled: true },
+  { id: 'doubao', name: '豆包', url: 'https://www.doubao.com/chat/', icon: 'doubao.svg', color: '#3B82F6', group: '对话', enabled: true },
+  { id: 'qwen', name: '通义千问', url: 'https://tongyi.aliyun.com/qianwen/', icon: 'qwen.svg', color: '#615CED', group: '对话', enabled: true },
+  { id: 'wenxin', name: '文心一言', url: 'https://yiyan.baidu.com/', icon: 'wenxin.svg', color: '#2932E1', group: '对话', enabled: true },
+  { id: 'chatglm', name: '智谱清言', url: 'https://chatglm.cn/', icon: 'chatglm.svg', color: '#3859FF', group: '对话', enabled: true },
+  { id: 'yuanbao', name: '腾讯元宝', url: 'https://yuanbao.tencent.com/', icon: 'yuanbao.svg', color: '#00A870', group: '对话', enabled: true },
+  { id: 'copilot', name: 'Copilot', url: 'https://copilot.microsoft.com/', icon: 'copilot.svg', color: '#0078D4', group: '对话', enabled: true },
+  { id: 'grok', name: 'Grok', url: 'https://grok.com/', icon: 'grok.svg', color: '#111827', group: '对话', enabled: true },
+  { id: 'perplexity', name: 'Perplexity', url: 'https://www.perplexity.ai/', icon: 'perplexity.svg', color: '#20808D', group: '搜索', enabled: true },
+  { id: 'poe', name: 'Poe', url: 'https://poe.com/', icon: 'poe.svg', color: '#5D5CDE', group: '对话', enabled: true },
+  { id: 'lechat', name: 'Le Chat', url: 'https://chat.mistral.ai/', icon: 'lechat.svg', color: '#FA520F', group: '对话', enabled: true },
+  { id: 'huggingchat', name: 'HuggingChat', url: 'https://huggingface.co/chat/', icon: 'huggingchat.svg', color: '#FFD21E', group: '对话', enabled: true },
+  { id: 'monica', name: 'Monica', url: 'https://monica.im/', icon: 'monica.svg', color: '#6C5CE7', group: '工具', enabled: true },
+  { id: 'tiangong', name: '天工 AI', url: 'https://www.tiangong.cn/', icon: 'tiangong.svg', color: '#2E6BFF', group: '对话', enabled: true },
+  { id: 'spark', name: '讯飞星火', url: 'https://xinghuo.xfyun.cn/', icon: 'spark.svg', color: '#1E6FFF', group: '对话', enabled: true },
+  { id: 'notebooklm', name: 'NotebookLM', url: 'https://notebooklm.google.com/', icon: 'notebooklm.svg', color: '#1A73E8', group: '工具', enabled: true },
+  { id: 'aistudio', name: 'Google AI Studio', url: 'https://aistudio.google.com/', icon: 'aistudio.svg', color: '#4285F4', group: '平台', enabled: true },
+  { id: 'siliconflow', name: '硅基流动', url: 'https://cloud.siliconflow.cn/', icon: 'siliconflow.svg', color: '#7C3AED', group: '平台', enabled: true },
+  { id: 'coze', name: 'Coze', url: 'https://www.coze.cn/', icon: 'coze.svg', color: '#111827', group: '平台', enabled: true },
+  { id: 'dify', name: 'Dify', url: 'https://cloud.dify.ai/', icon: 'dify.svg', color: '#1C64F2', group: '平台', enabled: true },
+  { id: 'hunyuan', name: '腾讯混元', url: 'https://hunyuan.tencent.com/', icon: 'hunyuan.svg', color: '#1E6FFF', group: '平台', enabled: true },
+  { id: 'baichuan', name: '百川智能', url: 'https://www.baichuan-ai.com/', icon: 'baichuan.svg', color: '#FF6B35', group: '平台', enabled: true },
+  { id: 'yi', name: '零一万物', url: 'https://www.lingyiwanwu.com/', icon: 'yi.svg', color: '#111827', group: '平台', enabled: true },
+  { id: 'minimax', name: '海螺 AI', url: 'https://hailuoai.com/', icon: 'minimax.svg', color: '#FF4D6D', group: '对话', enabled: true },
+  { id: 'stepfun', name: '跃问', url: 'https://yuewen.cn/', icon: 'stepfun.svg', color: '#2F6BFF', group: '对话', enabled: true },
+  { id: 'ai360', name: '360 智脑', url: 'https://chat.360.com/', icon: 'ai360.svg', color: '#00A650', group: '对话', enabled: true },
+  { id: 'internlm', name: '书生·浦语', url: 'https://internlm.intern-ai.org.cn/', icon: 'internlm.svg', color: '#2B5CE6', group: '平台', enabled: true },
+  { id: 'ling', name: '蚂蚁百灵', url: 'https://ling.tbox.cn/', icon: 'ling.svg', color: '#1677FF', group: '对话', enabled: true },
+  { id: 'modelscope', name: 'ModelScope', url: 'https://modelscope.cn/', icon: 'modelscope.svg', color: '#6C5CE7', group: '平台', enabled: true },
+  { id: 'openrouter', name: 'OpenRouter', url: 'https://openrouter.ai/', icon: 'openrouter.svg', color: '#6C5CE7', group: '平台', enabled: true },
+  { id: 'githubcopilot', name: 'GitHub Copilot', url: 'https://github.com/copilot', icon: 'githubcopilot.svg', color: '#111827', group: '工具', enabled: true },
+  { id: 'phind', name: 'Phind', url: 'https://www.phind.com/', icon: 'phind.svg', color: '#111827', group: '搜索', enabled: true },
+  { id: 'lambda', name: 'Lambda Chat', url: 'https://lambda.chat/', icon: 'lambda.svg', color: '#111827', group: '对话', enabled: true },
+  { id: 'youmind', name: 'YouMind', url: 'https://youmind.com/', icon: 'youmind.svg', color: '#111827', group: '工具', enabled: true },
+  { id: 'ai21', name: 'AI21 Studio', url: 'https://studio.ai21.com/', icon: 'ai21.svg', color: '#E93CAC', group: '平台', enabled: true }
+]
+
+export const AUTH_DOMAINS = [
+  'google.com',
+  'microsoft.com',
+  'live.com',
+  'openai.com',
+  'anthropic.com'
+]
