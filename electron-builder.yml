@@ -13,6 +13,8 @@ files:
 extraResources:
   - from: resources/browser-bridge
     to: browser-bridge
+  - from: build/icon.png
+    to: icon.png
 
 asar: true
 npmRebuild: false

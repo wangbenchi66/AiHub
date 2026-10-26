@@ -4,6 +4,13 @@ import { dirname, join } from 'node:path'
 
 const PARTITION = 'persist:aihub'
 
+function appIconPath(): string | undefined {
+  const candidates = app.isPackaged
+    ? [join(process.resourcesPath, 'icon.png')]
+    : [join(__dirname, '../../build/icon.png')]
+  return candidates.find((candidate) => existsSync(candidate))
+}
+
 export function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
     width: 1440,
@@ -12,6 +19,7 @@ export function createMainWindow(): BrowserWindow {
     minHeight: 720,
     show: false,
     title: 'AiHub',
+    icon: appIconPath(),
     backgroundColor: '#F7F7F8',
     autoHideMenuBar: process.platform !== 'darwin',
     webPreferences: {
