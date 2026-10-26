@@ -42,6 +42,17 @@ npm run build:mac    # 需要 macOS 环境
 
 也可以直接双击根目录的 **`启动AiHub.bat`**：它会检查 npm / Electron 是否就绪，然后执行 `npm run dev`，并使用项目内的 `.electron-data` 作为开发数据目录。首次使用前仍需先执行一次 `npm install`。
 
+## 发布
+
+推送 `v*` tag 会自动触发 GitHub Actions，构建 Windows / macOS 并创建 GitHub Release：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+tag 必须与 `package.json` 的 `version` 一致。工作流见 `.github/workflows/release.yml`，Release 会附带安装包、便携版、DMG/ZIP 和 `SHA256SUMS.txt`。
+
 如果 `npm install` 后 Electron 没下载完整（国内网络）：
 
 ```powershell

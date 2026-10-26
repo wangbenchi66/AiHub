@@ -1,0 +1,124 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check tag matches package.json
+        shell: bash
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          node -e "const p=require('./package.json'); const tag=process.argv[1]; if (p.version !== tag) { console.error('Tag ' + tag + ' does not match package.json ' + p.version); process.exit(1) }" "$TAG_VERSION"
+
+  windows:
+    name: Build Windows
+    needs: validate
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Generate Bridge manifest
+        run: npm run sync:bridge
+      - name: Build application
+        run: npm run build
+      - name: Package Windows
+        run: npx electron-builder --win --publish never
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AiHub-Windows
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            release/*.exe
+
+  macos:
+    name: Build macOS
+    needs: validate
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Generate Bridge manifest
+        run: npm run sync:bridge
+      - name: Build application
+        run: npm run build
+      - name: Package macOS
+        run: npx electron-builder --mac --publish never
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AiHub-macOS
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            release/*.dmg
+            release/*.zip
+
+  release:
+    name: Publish GitHub Release
+    needs: [windows, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: AiHub-*
+          path: release
+          merge-multiple: true
+      - name: Generate checksums
+        shell: bash
+        run: |
+          cd release
+          mapfile -t files < <(find . -maxdepth 1 -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.zip' \) -printf '%f\n' | sort)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No release artifacts found"
+            exit 1
+          fi
+          sha256sum "${files[@]}" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: AiHub ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: release/*
