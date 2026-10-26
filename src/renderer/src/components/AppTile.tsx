@@ -77,16 +77,7 @@ export function AppTile({
       <span className="tile-ico">
         <ProviderIcon provider={provider} size={34} />
       </span>
-      <span className="tile-name">
-        {provider.pinned ? (
-          <span className="tile-pin" title="已置顶" aria-label="已置顶">
-            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M9.7 1.6l4.7 4.7-1.9 1.9-.6-.2-2.4 2.4.2 1.3-1.3 1.3-4.8-4.8 1.3-1.3 1.3.2 2.4-2.4-.2-.6 1.3-1.5zM5.8 10.2l-3.2 3.2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-            </svg>
-          </span>
-        ) : null}
-        {provider.name}
-      </span>
+      <span className="tile-name">{provider.name}</span>
 
       <button
         className="tile-menu-btn"

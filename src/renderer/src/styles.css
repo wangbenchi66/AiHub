@@ -1138,10 +1138,16 @@ html[data-theme='dark'] .search input::placeholder {
   color: #f5a524;
 }
 
+.tile.pinned .tile-ico {
+  border-color: #f0b429;
+  outline: 2px solid rgba(240, 180, 41, 0.55);
+  outline-offset: 1px;
+}
+
 .tile-menu-btn {
   position: absolute;
   top: -5px;
-  left: 4px;
+  right: 28px;
   width: 20px;
   height: 20px;
   border: 0;
@@ -1178,7 +1184,7 @@ html[data-theme='dark'] .search input::placeholder {
 .tile-menu {
   position: absolute;
   top: 22px;
-  left: 0;
+  right: 0;
   z-index: 40;
   width: 108px;
   padding: 4px;
@@ -1214,25 +1220,6 @@ html[data-theme='dark'] .search input::placeholder {
 .tile-menu button.danger:hover {
   background: rgba(239, 68, 68, 0.1);
   color: var(--danger);
-}
-
-.tile-pin {
-  display: inline-grid;
-  place-items: center;
-  width: 11px;
-  height: 11px;
-  margin-right: 3px;
-  vertical-align: -1px;
-  color: #f5a524;
-}
-
-.tile-pin svg {
-  width: 11px;
-  height: 11px;
-}
-
-.tile.pinned .tile-ico {
-  border-color: rgba(245, 165, 36, 0.45);
 }
 
 .tile.add .tile-ico {
