@@ -7,12 +7,16 @@ export function AppGrid({
   favorites,
   onOpen,
   onToggleFavorite,
+  onEdit,
+  onDelete,
   onAdd
 }: {
   providers: Provider[]
   favorites: string[]
   onOpen: (provider: Provider) => void
   onToggleFavorite: (provider: Provider) => void
+  onEdit: (provider: Provider) => void
+  onDelete: (provider: Provider) => void
   onAdd?: () => void
 }): ReactElement {
   const favoriteSet = new Set(favorites)
@@ -26,6 +30,8 @@ export function AppGrid({
           favorite={favoriteSet.has(provider.id)}
           onOpen={onOpen}
           onToggleFavorite={onToggleFavorite}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
       {onAdd ? (

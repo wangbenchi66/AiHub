@@ -17,6 +17,7 @@ import { ProviderView } from './components/ProviderView'
 import { SettingsDrawer } from './components/SettingsDrawer'
 import { Onboarding } from './components/Onboarding'
 import { AddProviderDialog } from './components/AddProviderDialog'
+import { ConfirmDialog } from './components/ConfirmDialog'
 import { Toast } from './components/Toast'
 import appIcon from './assets/app-icon.png'
 
@@ -58,6 +59,8 @@ export default function App(): ReactElement {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
+  const [editingProvider, setEditingProvider] = useState<Provider | null>(null)
+  const [deletingProvider, setDeletingProvider] = useState<Provider | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
   const toastTimer = useRef<number | undefined>(undefined)
@@ -298,16 +301,51 @@ export default function App(): ReactElement {
     showToast('没有找到匹配的站点，按 Enter 可直接打开网址')
   }, [settings, openProvider, openUrl, showToast])
 
-  const addProvider = useCallback(async (provider: Provider): Promise<void> => {
-    try {
-      const saved = await window.aihub.saveProviders([...(settings?.providers ?? []), provider])
-      setSettings((prev) => (prev ? { ...prev, providers: saved } : prev))
-      setAddOpen(false)
-      openProvider(provider)
-    } catch (error) {
-      showToast(error instanceof Error ? error.message : '添加失败')
+  const saveProvider = useCallback(async (provider: Provider): Promise<void> => {
+    if (!settings) return
+    const exists = settings.providers.some((item) => item.id === provider.id)
+    const providers = exists
+      ? settings.providers.map((item) => (item.id === provider.id ? provider : item))
+      : [...settings.providers, provider]
+    const next = await updateSettings({ providers })
+    if (!next) return
+    setAddOpen(false)
+    setEditingProvider(null)
+    if (!exists) openProvider(provider)
+    else showToast('已保存')
+  }, [settings, updateSettings, openProvider, showToast])
+
+  const deleteProvider = useCallback(async (provider: Provider): Promise<void> => {
+    if (!settings) return
+    const providers = settings.providers.filter((item) => item.id !== provider.id)
+    const favorites = settings.favorites.filter((id) => id !== provider.id)
+    const recent = settings.recent.filter((id) => id !== provider.id)
+    const next = await updateSettings({ providers, favorites, recent })
+    if (!next) return
+    setDeletingProvider(null)
+    const affected = tabs.filter((tab) => tab.providerId === provider.id)
+    if (affected.length === 0) {
+      showToast(`已删除 ${provider.name}`)
+      return
     }
-  }, [settings, openProvider, showToast])
+    const remaining = tabs.filter((tab) => tab.providerId !== provider.id)
+    setTabs(remaining)
+    setTitles((prev) => {
+      const copy = { ...prev }
+      for (const tab of affected) delete copy[tab.tabId]
+      return copy
+    })
+    if (affected.some((tab) => tab.tabId === activeTabId)) {
+      setActiveTabId(remaining.length ? remaining[remaining.length - 1].tabId : 'home')
+      if (remaining.length === 0) setView('home')
+    }
+    if (remaining.length === 0) {
+      setHomeOpen(true)
+      setActiveTabId('home')
+      setView('home')
+    }
+    showToast(`已删除 ${provider.name}`)
+  }, [settings, tabs, activeTabId, updateSettings, showToast])
 
   const toggleFavorite = useCallback((provider: Provider): void => {
     const current = settings
@@ -551,6 +589,8 @@ export default function App(): ReactElement {
             onOpen={openProvider}
             onOpenUrl={(url) => { void openUrl(url) }}
             onToggleFavorite={toggleFavorite}
+            onEdit={(provider) => setEditingProvider(provider)}
+            onDelete={(provider) => setDeletingProvider(provider)}
             onAdd={() => setAddOpen(true)}
           />
         ) : null}
@@ -582,10 +622,24 @@ export default function App(): ReactElement {
         />
       ) : null}
 
-      {addOpen ? (
+      {addOpen || editingProvider ? (
         <AddProviderDialog
-          onClose={() => setAddOpen(false)}
-          onAdd={(provider) => { void addProvider(provider) }}
+          key={editingProvider?.id ?? 'new-provider'}
+          provider={editingProvider ?? undefined}
+          onClose={() => {
+            setAddOpen(false)
+            setEditingProvider(null)
+          }}
+          onSave={(provider) => { void saveProvider(provider) }}
+        />
+      ) : null}
+
+      {deletingProvider ? (
+        <ConfirmDialog
+          title="删除应用"
+          message={`确定删除「${deletingProvider.name}」吗？如果它正在标签页中打开，也会一并关闭。`}
+          onCancel={() => setDeletingProvider(null)}
+          onConfirm={() => { if (deletingProvider) void deleteProvider(deletingProvider) }}
         />
       ) : null}
 

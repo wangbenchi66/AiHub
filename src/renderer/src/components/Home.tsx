@@ -24,6 +24,8 @@ export function Home({
   onOpen,
   onOpenUrl,
   onToggleFavorite,
+  onEdit,
+  onDelete,
   onAdd
 }: {
   view: RailView
@@ -37,6 +39,8 @@ export function Home({
   onOpen: (provider: Provider) => void
   onOpenUrl: (url: string) => void
   onToggleFavorite: (provider: Provider) => void
+  onEdit: (provider: Provider) => void
+  onDelete: (provider: Provider) => void
   onAdd: () => void
 }): ReactElement {
   const url = urlFromQuery(query)
@@ -77,6 +81,8 @@ export function Home({
             favorites={favorites}
             onOpen={onOpen}
             onToggleFavorite={onToggleFavorite}
+            onEdit={onEdit}
+            onDelete={onDelete}
             onAdd={view === 'home' ? onAdd : undefined}
           />
         )}
