@@ -47,7 +47,8 @@ export function AddProviderDialog({
       color,
       group: provider?.group ?? '工具',
       enabled: provider?.enabled ?? true,
-      custom: provider?.custom ?? true
+      custom: provider?.custom ?? true,
+      pinned: provider?.pinned ?? false
     })
   }
 

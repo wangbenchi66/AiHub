@@ -31,6 +31,10 @@ function isUrlLike(value: string): boolean {
   return /^https?:\/\//i.test(trimmed) || /^[a-z0-9-]+(\.[a-z0-9-]+)+([/?#].*)?$/i.test(trimmed)
 }
 
+function pinnedFirst(providers: Provider[]): Provider[] {
+  return [...providers].sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)))
+}
+
 export default function App(): ReactElement {
   const [boot, setBoot] = useState<Bootstrap | null>(null)
   const [settings, setSettings] = useState<Settings | null>(null)
@@ -356,6 +360,16 @@ export default function App(): ReactElement {
     void updateSettings({ favorites })
   }, [settings, updateSettings])
 
+  const togglePin = useCallback((provider: Provider): void => {
+    const current = settings
+    if (!current) return
+    const providers = current.providers.map((item) =>
+      item.id === provider.id ? { ...item, pinned: !item.pinned } : item
+    )
+    void updateSettings({ providers })
+    showToast(provider.pinned ? '已取消置顶' : '已置顶')
+  }, [settings, updateSettings, showToast])
+
   const rerunOnboarding = useCallback(async (): Promise<void> => {
     try {
       const list = await window.aihub.detectBrowsers()
@@ -484,13 +498,15 @@ export default function App(): ReactElement {
   const visibleProviders = useMemo(() => {
     if (!settings) return []
     const all = settings.providers.filter((p) => p.enabled)
-    if (view === 'favorites') return all.filter((p) => settings.favorites.includes(p.id))
+    if (view === 'favorites') return pinnedFirst(all.filter((p) => settings.favorites.includes(p.id)))
     if (view === 'recent') {
-      return settings.recent
-        .map((id) => all.find((p) => p.id === id))
-        .filter((p): p is Provider => Boolean(p))
+      return pinnedFirst(
+        settings.recent
+          .map((id) => all.find((p) => p.id === id))
+          .filter((p): p is Provider => Boolean(p))
+      )
     }
-    return all
+    return pinnedFirst(all)
   }, [settings, view])
 
   const filteredProviders = useMemo(() => {
@@ -589,6 +605,7 @@ export default function App(): ReactElement {
             onOpen={openProvider}
             onOpenUrl={(url) => { void openUrl(url) }}
             onToggleFavorite={toggleFavorite}
+            onTogglePin={togglePin}
             onEdit={(provider) => setEditingProvider(provider)}
             onDelete={(provider) => setDeletingProvider(provider)}
             onAdd={() => setAddOpen(true)}

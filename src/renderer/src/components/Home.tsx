@@ -24,6 +24,7 @@ export function Home({
   onOpen,
   onOpenUrl,
   onToggleFavorite,
+  onTogglePin,
   onEdit,
   onDelete,
   onAdd
@@ -39,6 +40,7 @@ export function Home({
   onOpen: (provider: Provider) => void
   onOpenUrl: (url: string) => void
   onToggleFavorite: (provider: Provider) => void
+  onTogglePin: (provider: Provider) => void
   onEdit: (provider: Provider) => void
   onDelete: (provider: Provider) => void
   onAdd: () => void
@@ -81,6 +83,7 @@ export function Home({
             favorites={favorites}
             onOpen={onOpen}
             onToggleFavorite={onToggleFavorite}
+            onTogglePin={onTogglePin}
             onEdit={onEdit}
             onDelete={onDelete}
             onAdd={view === 'home' ? onAdd : undefined}

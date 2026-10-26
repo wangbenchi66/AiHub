@@ -7,6 +7,7 @@ export function AppGrid({
   favorites,
   onOpen,
   onToggleFavorite,
+  onTogglePin,
   onEdit,
   onDelete,
   onAdd
@@ -15,6 +16,7 @@ export function AppGrid({
   favorites: string[]
   onOpen: (provider: Provider) => void
   onToggleFavorite: (provider: Provider) => void
+  onTogglePin: (provider: Provider) => void
   onEdit: (provider: Provider) => void
   onDelete: (provider: Provider) => void
   onAdd?: () => void
@@ -30,6 +32,7 @@ export function AppGrid({
           favorite={favoriteSet.has(provider.id)}
           onOpen={onOpen}
           onToggleFavorite={onToggleFavorite}
+          onTogglePin={onTogglePin}
           onEdit={onEdit}
           onDelete={onDelete}
         />

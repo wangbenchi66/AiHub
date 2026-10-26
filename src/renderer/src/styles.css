@@ -1216,6 +1216,25 @@ html[data-theme='dark'] .search input::placeholder {
   color: var(--danger);
 }
 
+.tile-pin {
+  display: inline-grid;
+  place-items: center;
+  width: 11px;
+  height: 11px;
+  margin-right: 3px;
+  vertical-align: -1px;
+  color: #f5a524;
+}
+
+.tile-pin svg {
+  width: 11px;
+  height: 11px;
+}
+
+.tile.pinned .tile-ico {
+  border-color: rgba(245, 165, 36, 0.45);
+}
+
 .tile.add .tile-ico {
   border-style: dashed;
   border-color: #cfcfd6;

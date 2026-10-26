@@ -13,6 +13,7 @@ export interface Provider {
   group: ProviderGroup
   enabled: boolean
   custom?: boolean
+  pinned?: boolean
 }
 
 export interface ProfileInfo {
