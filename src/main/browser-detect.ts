@@ -156,7 +156,8 @@ function existing(paths: string[]): string | undefined {
   return paths.find((p) => p && existsSync(p))
 }
 
-export function readProfiles(userDataDir: string): ProfileInfo[] {  const localState = join(userDataDir, 'Local State')
+export function readProfiles(userDataDir: string): ProfileInfo[] {
+  const localState = join(userDataDir, 'Local State')
   try {
     if (!existsSync(localState)) return []
     const raw = JSON.parse(readFileSync(localState, 'utf8')) as {
@@ -171,6 +172,21 @@ export function readProfiles(userDataDir: string): ProfileInfo[] {  const localS
         lastUsed: info.last_used
       }))
       .sort((a, b) => (b.lastUsed ?? 0) - (a.lastUsed ?? 0))
+  } catch {
+    return []
+  }
+}
+
+/**
+ * macOS Chrome/Edge can have a readable profile directory but an unreadable or
+ * missing Local State (first launch, Full Disk Access, locked file). Fall back
+ * to the actual profile folders so the wizard is not stuck on “下一步”.
+ */
+function scanProfileFolders(userDataDir: string): ProfileInfo[] {
+  try {
+    return readdirSync(userDataDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && (entry.name === 'Default' || /^Profile \d+$/.test(entry.name)))
+      .map((entry) => ({ dir: entry.name, name: entry.name }))
   } catch {
     return []
   }
@@ -201,7 +217,11 @@ export async function detectBrowsers(): Promise<BrowserInfo[]> {
     const exe = existing(process.platform === 'darwin' ? def.macExe : def.winExe)
     if (!exe) continue
     const userDataDir = existing(process.platform === 'darwin' ? def.macData : def.winData) ?? ''
-    const profiles = userDataDir ? readProfiles(userDataDir) : []
+    let profiles = userDataDir ? readProfiles(userDataDir) : []
+    if (!profiles.length && def.family === 'chromium') {
+      profiles = userDataDir ? scanProfileFolders(userDataDir) : []
+      if (!profiles.length) profiles = [{ dir: 'Default', name: 'Default' }]
+    }
     let running = false
     for (const proc of process.platform === 'darwin' ? def.macProcs : def.winProcs) {
       if (await isRunning(proc)) {

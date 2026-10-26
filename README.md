@@ -1,4 +1,4 @@
-# AiHub
+﻿# AiHub
 
 AI 聚合桌面工具：把常用的 AI 站点收进一个软件里直接使用，不必在浏览器标签间频繁切换。
 
@@ -16,7 +16,7 @@ AI 聚合桌面工具：把常用的 AI 站点收进一个软件里直接使用�
 - **完整 Web 登录凭证**：同步 Cookie + localStorage + sessionStorage（所有站点）；DeepSeek 的 `userToken` 也在内
 - 可打包为 Windows 安装包（NSIS）与 macOS DMG
 
-## 当前进度（v0.1.1 / M2）
+## 当前进度（v0.1.2 / M2）
 
 已可运行：
 
@@ -50,8 +50,8 @@ npm run build:mac    # 需要 macOS 环境
 推送 `v*` tag 会自动触发 GitHub Actions，构建 Windows / macOS 并创建 GitHub Release：
 
 ```bash
-git tag v0.1.1
-git push origin v0.1.1
+git tag v0.1.2
+git push origin v0.1.2
 ```
 
 tag 必须与 `package.json` 的 `version` 一致。工作流见 `.github/workflows/release.yml`，Release 会附带安装包、便携版、DMG/ZIP。
@@ -91,3 +91,4 @@ Chrome / Edge / Brave / Vivaldi / Opera 完整支持；QQ / 360 / 搜狗 / Arc /
 - [初始化第 1 步](docs/screenshots/onboarding.png)
 - [初始化第 2 步](docs/screenshots/onboarding-step2.png)
 - [初始化第 3 步](docs/screenshots/onboarding-step3.png)
+
