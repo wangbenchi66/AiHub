@@ -145,6 +145,54 @@ export function ProviderView({
     }
   }, [onTitle, provider.url])
 
+  useEffect(() => {
+    const el = webviewRef.current
+    if (!el) return
+
+    if (!active) {
+      try {
+        el.blur()
+      } catch {
+        // hidden webview may already be detached
+      }
+      return
+    }
+
+    let disposed = false
+    let focusTimer: number | undefined
+    const focusInput = (): void => {
+      if (disposed) return
+      try {
+        // macOS IME keeps the input context of the last focused WebContents.
+        // Blur, then focus on the next tick, makes the newly selected webview
+        // own the input method again.
+        el.blur()
+      } catch {
+        // webview not ready
+      }
+      window.clearTimeout(focusTimer)
+      focusTimer = window.setTimeout(() => {
+        if (disposed) return
+        try {
+          el.focus()
+        } catch {
+          // webview not ready
+        }
+      }, 20)
+    }
+    const timer = window.setTimeout(focusInput, 60)
+    el.addEventListener('dom-ready', focusInput)
+    window.addEventListener('focus', focusInput)
+
+    return () => {
+      disposed = true
+      window.clearTimeout(timer)
+      window.clearTimeout(focusTimer)
+      el.removeEventListener('dom-ready', focusInput)
+      window.removeEventListener('focus', focusInput)
+    }
+  }, [active])
+
   const host = (() => {
     try {
       return new URL(url).hostname

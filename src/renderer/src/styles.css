@@ -742,10 +742,6 @@ img {
   height: 14px;
 }
 
-.top-tab-home .top-tab-title {
-  max-width: 80px;
-}
-
 .tabbar {
   height: 46px;
   flex: none;

@@ -29,10 +29,8 @@ export function Sidebar({
   sync,
   view,
   collapsed,
-  homeOpen,
   onSelectTab,
   onCloseTab,
-  onCloseHome,
   onHome,
   onNew,
   onView,
@@ -48,10 +46,8 @@ export function Sidebar({
   sync: SyncStatus
   view: RailView
   collapsed: boolean
-  homeOpen: boolean
   onSelectTab: (tabId: string) => void
   onCloseTab: (tabId: string) => void
-  onCloseHome: () => void
   onHome: () => void
   onNew: () => void
   onView: (view: RailView) => void
@@ -65,11 +61,6 @@ export function Sidebar({
   const close = (event: MouseEvent, tabId: string): void => {
     event.stopPropagation()
     onCloseTab(tabId)
-  }
-
-  const closeHome = (event: MouseEvent): void => {
-    event.stopPropagation()
-    onCloseHome()
   }
 
   return (
@@ -96,74 +87,48 @@ export function Sidebar({
         <span>新建标签</span>
       </button>
 
-      <div className="side-section side-tabs-section">
-        <div className="side-label">
-          <span>已打开</span>
-          <span className="count">{tabs.length + (homeOpen ? 1 : 0)}</span>
-        </div>
-        <div className="tab-list">
-          {homeOpen ? (
-            <div
-              className={`side-tab${activeTabId === 'home' ? ' active' : ''}`}
-              onClick={onHome}
-              title="AI 广场"
-            >
-              <span className="side-tab-ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                  <rect x="4" y="4" width="6" height="6" rx="1.4" />
-                  <rect x="14" y="4" width="6" height="6" rx="1.4" />
-                  <rect x="4" y="14" width="6" height="6" rx="1.4" />
-                  <rect x="14" y="14" width="6" height="6" rx="1.4" />
-                </svg>
-              </span>
-              <span className="side-tab-title">AI 广场</span>
-              <button
-                className="side-tab-close"
-                title="关闭标签"
-                aria-label="关闭 AI 广场"
-                onClick={closeHome}
-              >
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                  <path d="M2 2l6 6M8 2L2 8" />
-                </svg>
-              </button>
-            </div>
-          ) : null}
-
-          {tabs.map((tab) => {
-            const provider = byId.get(tab.providerId)
-            if (!provider) return null
-            return (
-              <div
-                key={tab.tabId}
-                className={`side-tab${activeTabId === tab.tabId ? ' active' : ''}`}
-                title={titles[tab.tabId] || provider.name}
-                onClick={() => onSelectTab(tab.tabId)}
-                onMouseDown={(event) => {
-                  if (event.button === 1) {
-                    event.preventDefault()
-                    onCloseTab(tab.tabId)
-                  }
-                }}
-              >
-                <span className="side-tab-ico">
-                  <ProviderIcon provider={provider} size={16} />
-                </span>
-                <span className="side-tab-title">{provider.name}</span>
-                <button
-                  className="side-tab-close"
-                  title="关闭标签"
-                  onClick={(event) => close(event, tab.tabId)}
+      {tabs.length > 0 ? (
+        <div className="side-section side-tabs-section">
+          <div className="side-label">
+            <span>已打开</span>
+            <span className="count">{tabs.length}</span>
+          </div>
+          <div className="tab-list">
+            {tabs.map((tab) => {
+              const provider = byId.get(tab.providerId)
+              if (!provider) return null
+              return (
+                <div
+                  key={tab.tabId}
+                  className={`side-tab${activeTabId === tab.tabId ? ' active' : ''}`}
+                  title={titles[tab.tabId] || provider.name}
+                  onClick={() => onSelectTab(tab.tabId)}
+                  onMouseDown={(event) => {
+                    if (event.button === 1) {
+                      event.preventDefault()
+                      onCloseTab(tab.tabId)
+                    }
+                  }}
                 >
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                    <path d="M2 2l6 6M8 2L2 8" />
-                  </svg>
-                </button>
-              </div>
-            )
-          })}
+                  <span className="side-tab-ico">
+                    <ProviderIcon provider={provider} size={16} />
+                  </span>
+                  <span className="side-tab-title">{provider.name}</span>
+                  <button
+                    className="side-tab-close"
+                    title="关闭标签"
+                    onClick={(event) => close(event, tab.tabId)}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                      <path d="M2 2l6 6M8 2L2 8" />
+                    </svg>
+                  </button>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="side-section side-nav-section">
         <div className="side-label">
